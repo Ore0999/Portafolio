@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu Nombre — Fotografía de conciertos</title>
+<meta name="description" content="Fotógrafo de música en vivo. Conciertos, giras y festivales.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0c0a10; --surface:#17131f; --text:#f3eefb; --muted:#9d94b0; --accent:#ff4d6d; --line:#2a2336;
+  --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-behavior:smooth;scroll-padding-top:calc(64px + env(safe-area-inset-top,0px))}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font:400 1rem/1.6 var(--body);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+h2{font:900 clamp(2.4rem,8vw,4.5rem)/.95 var(--display);margin:0 0 28px;letter-spacing:.01em}
+
+/* Loader */
+#loader{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);transition:opacity .6s,visibility .6s}
+#loader.done{opacity:0;visibility:hidden}
+#loader span{font:900 7rem/1 var(--display);color:var(--accent);animation:pulse 1s ease-in-out infinite alternate}
+@keyframes pulse{from{opacity:.25;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+
+/* Menú */
+header{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:rgba(12,10,16,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header nav{display:flex;gap:22px;align-items:center;height:56px;padding:0 20px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;max-width:1100px;margin:0 auto}
+header nav::-webkit-scrollbar{display:none}
+header a{text-decoration:none;font-size:.92rem;color:var(--muted)}
+header a:hover{color:var(--text)}
+header .logo{font:900 1.5rem/1 var(--display);color:var(--text);margin-right:auto}
+header small{color:var(--muted);opacity:.55;font-size:.78rem}
+
+/* Hero con luz que sigue el dedo o el cursor */
+#hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 20px 56px;overflow:hidden;
+  --x:50%;--y:35%;
+  background:radial-gradient(520px circle at var(--x) var(--y),rgba(255,77,109,.38),transparent 65%),
+             radial-gradient(900px circle at 85% 0%,rgba(90,70,200,.25),transparent 60%),var(--bg)}
+#hero h1{font:900 clamp(5rem,28vw,17rem)/.82 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+#hero p{max-width:34ch;color:var(--muted);margin:24px 0 0;font-size:1.05rem}
+#hero .hint{margin-top:28px;font-size:.85rem;color:var(--muted)}
+.rise{opacity:0;transform:translateY(24px);transition:opacity .9s .25s,transform .9s .25s}
+body.ready .rise{opacity:1;transform:none}
+body.ready #hero p.rise{transition-delay:.5s}
+
+section{padding:88px 0}
+.lead{color:var(--muted);margin:-12px 0 32px;max-width:46ch}
+
+/* Artistas: carrusel horizontal */
+.track{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 20px 20px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.card{flex:0 0 min(78vw,340px);aspect-ratio:3/4;scroll-snap-align:center;position:relative;border:0;padding:0;text-align:left;color:var(--text);cursor:pointer;
+  background-size:cover;background-position:center;border-radius:6px;overflow:hidden;font:inherit}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(8,6,12,.92))}
+.card .info{position:absolute;left:18px;right:18px;bottom:18px;z-index:1}
+.card strong{display:block;font:900 2.2rem/1 var(--display)}
+.card em{display:block;font-style:normal;color:#d9cfe9;font-size:.9rem;margin:6px 0 10px}
+.card span{font-size:.82rem;color:var(--accent)}
+.card:hover{outline:2px solid var(--accent)}
+
+/* Película */
+.film{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:0 20px 16px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.film div{flex:0 0 auto;height:min(52vh,380px);aspect-ratio:2/3;border-radius:4px;background-size:cover;background-position:center;scroll-snap-align:start;filter:sepia(.25) contrast(1.05)}
+.more{display:inline-block;margin:12px 20px 0;color:var(--accent);font-weight:600}
+
+/* Acerca de */
+.about{display:grid;gap:32px}
+.about .photo{aspect-ratio:4/5;border-radius:6px;background-size:cover;background-position:center}
+.about p{max-width:60ch;margin:0 0 16px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;list-style:none;padding:0;margin:24px 0 0}
+.stats li{border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:.88rem;color:var(--muted)}
+@media(min-width:800px){.about{grid-template-columns:5fr 6fr;align-items:center;gap:64px}}
+
+/* Contacto */
+#contacto{text-align:center;border-top:1px solid var(--line)}
+#contacto h2{margin-bottom:16px}
+#contacto .mail{display:inline-block;font:800 clamp(1.4rem,6vw,2.6rem)/1.1 var(--display);color:var(--accent);word-break:break-all}
+#contacto p{color:var(--muted)}
+.btn{display:inline-block;margin:8px 6px;padding:12px 26px;border-radius:99px;background:var(--accent);color:#1a0509;font-weight:600;text-decoration:none}
+.btn.alt{background:transparent;color:var(--text);border:1px solid var(--line)}
+footer{padding:28px 20px calc(28px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--muted);font-size:.85rem}
+
+/* Galería (visor) */
+#viewer{position:fixed;inset:0;z-index:90;background:var(--bg);overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px 40px;display:none}
+#viewer.open{display:block}
+#viewer .bar{display:flex;justify-content:space-between;align-items:center;max-width:1100px;margin:0 auto 20px}
+#viewer h3{font:900 2.4rem/1 var(--display);margin:0}
+#viewer button.close{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:99px;padding:10px 20px;font:inherit;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:1100px;margin:0 auto}
+.grid div{aspect-ratio:4/5;background-size:cover;background-position:center;border-radius:4px}
+@media(min-width:800px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}#loader span{animation:none}.rise{transition:none;opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div id="loader" aria-hidden="true"><span>E</span></div>
+
+<header>
+  <nav aria-label="Principal">
+    <a class="logo" href="#hero">Tu Nombre</a>
+    <a href="#artistas">Artistas</a>
+    <a href="#film">Film</a>
+    <a href="#acerca">Acerca de</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
+</header>
+
+<main>
+  <section id="hero" aria-label="Inicio">
+    <h1 class="rise">Tu<br>Nombre</h1>
+    <p class="rise">Videografo- Produccion audiovisual</p>
+  </section>
+
+  <section id="artistas">
+    <div class="wrap"><h2>Artistas</h2><p class="lead">Toca una tarjeta para abrir su galería.</p></div>
+    <div class="track" id="artistTrack"></div>
+  </section>
+
+  <section id="film">
+    <div class="wrap"><h2>Film photography</h2><p class="lead">Fuera del escenario. Desliza para ver más.</p></div>
+    <div class="film" id="filmTrack"></div>
+    <a class="more" href="#film" id="filmMore"></a>
+  </section>
+
+  <section id="acerca">
+    <div class="wrap about">
+      <div class="photo" id="aboutPhoto" role="img" aria-label="Retrato del fotógrafo"></div>
+      <div>
+        <h2>Acerca de mí</h2>
+        <p>Escribe aquí tu historia en dos o tres frases: cuándo empezaste, qué te mueve y cómo trabajas.</p>
+        <p>Cuenta con qué artistas, marcas o festivales has trabajado y desde qué ciudad te mueves.</p>
+        <ul class="stats" id="stats"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto">
+    <div class="wrap">
+      <h2>Trabajemos juntos</h2>
+      <p>¿Un show, una gira o un proyecto visual? Cuéntame tu idea.</p>
+      <a class="mail" id="mailLink" href="#"></a>
+      <div style="margin-top:24px">
+        <a class="btn" id="mailBtn" href="#">Escríbeme</a>
+        <a class="btn alt" id="igBtn" href="#" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="foot"></footer>
+
+<div id="viewer" role="dialog" aria-modal="true" aria-label="Galería">
+  <div class="bar"><h3 id="vTitle"></h3><button class="close" id="vClose">Cerrar</button></div>
+  <div class="grid" id="vGrid"></div>
+</div>
+
+<script>
+/* ============ EDITA SOLO ESTA PARTE ============
+   Sube tus fotos a tu hosting y pon aquí sus rutas.
+   Si una ruta aún no existe, se muestra un degradado de color. */
+const CONFIG = {
+  nombre: "Emanuel Fonseca",
+  email: "fftemanuel@gmail.com",
+  instagram: "https://www.instagram.com/emanuel.fonsecam/",
+  ciudad: "Bogota, Colombia",
+  fotoRetrato: "about/me.jpg",
+  stats: ["Videografo", "Produccion audiovisual", "Experiencia en Bodas", "Bogota"],
+  filmFolder: "film/gallery/", filmTotal: 24, filmVisibles: 10,
+  artistas: [
+    { slug: "BODA",    nombre: "BODA",    genero: "BODA",   frase: ".", fotos: 20, hue: 345 },
+    { slug: "15 AÑOS",    nombre: "15 AÑOS",    genero: "15 AÑOS",    frase: "", fotos: 25, hue: 150 },
+    { slug: "EVENTOS",   nombre: "EVENTOS",   genero: "EVENTOS",      frase: ".",   fotos: 34, hue: 265 },
+    { slug: "", nombre: "", genero: "", frase: ".",                   fotos: 18, hue: 30  }
+  ]
+};
+/* CATEGORIA DE VIDEOS CARRUSEL */
+/* ================================================= */
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, "0");
+const grad = h => `linear-gradient(160deg,hsl(${h} 70% 38%),hsl(${(h+50)%360} 60% 14%))`;
+const bg = (url, h) => `url("${url}"),${grad(h)}`;
+
+document.title = CONFIG.nombre + " — Fotografía de eventos";
+document.querySelector(".logo").textContent = CONFIG.nombre;
+document.querySelector("#hero h1").innerHTML = CONFIG.nombre.split(" ").map(w => w.replace(/[<>&]/g, "")).join("<br>");
+
+/* Artistas */
+CONFIG.artistas.forEach((a, i) => {
+  const b = document.createElement("button");
+  b.className = "card";
+  b.style.backgroundImage = bg(`artists/${a.slug}/cover.webp`, a.hue);
+  b.setAttribute("aria-label", `${a.nombre}, abrir galería de ${a.fotos} fotos`);
+  const info = document.createElement("div"); info.className = "info";
+  const s = document.createElement("strong"); s.textContent = a.nombre;
+  const e = document.createElement("em"); e.textContent = `${a.genero}. ${a.frase}`;
+  const c = document.createElement("span"); c.textContent = `Ver galería: ${a.fotos} fotos`;
+  info.append(s, e, c); b.append(info);
+  b.addEventListener("click", () => openViewer(a));
+  $("artistTrack").append(b);
+});
+
+/* Film */
+for (let i = 0; i < CONFIG.filmVisibles; i++) {
+  const n = Math.max(1, Math.round((i + 1) * CONFIG.filmTotal / CONFIG.filmVisibles));
+  const d = document.createElement("div");
+  d.style.backgroundImage = bg(`${CONFIG.filmFolder}${pad(n)}.webp`, 20 + i * 24);
+  d.setAttribute("role", "img"); d.setAttribute("aria-label", `Fotografía en película ${n}`);
+  $("filmTrack").append(d);
+}
+$("filmMore").textContent = `Ver las ${CONFIG.filmTotal} fotografías`;
+$("filmMore").addEventListener("click", ev => {
+  ev.preventDefault();
+  openViewer({ nombre: "Film photography", fotos: CONFIG.filmTotal, hue: 20, folder: CONFIG.filmFolder });
+});
+
+/* Acerca de y contacto */
+$("aboutPhoto").style.backgroundImage = bg(CONFIG.fotoRetrato, 300);
+CONFIG.stats.forEach(t => { const li = document.createElement("li"); li.textContent = t; $("stats").append(li); });
+$("mailLink").href = $("mailBtn").href = "mailto:" + CONFIG.email;
+$("mailLink").textContent = CONFIG.email;
+$("igBtn").href = CONFIG.instagram;
+$("foot").textContent = `${CONFIG.nombre}. ${CONFIG.ciudad}. © ${new Date().getFullYear()}`;
+
+/* Visor de galería */
+function openViewer(a) {
+  $("vTitle").textContent = a.nombre;
+  const g = $("vGrid"); g.textContent = "";
+  const folder = a.folder || `artists/${a.slug}/`;
+  for (let i = 1; i <= a.fotos; i++) {
+    const d = document.createElement("div");
+    d.style.backgroundImage = bg(`${folder}${pad(i)}.webp`, (a.hue + i * 9) % 360);
+    d.setAttribute("role", "img"); d.setAttribute("aria-label", `${a.nombre}, foto ${i}`);
+    g.append(d);
+  }
+  $("viewer").classList.add("open"); document.body.style.overflow = "hidden";
+  $("viewer").scrollTop = 0; $("vClose").focus();
+}
+function closeViewer() { $("viewer").classList.remove("open"); document.body.style.overflow = ""; }
+$("vClose").addEventListener("click", closeViewer);
+addEventListener("keydown", e => { if (e.key === "Escape") closeViewer(); });
+
+/* Luz del hero */
+const hero = $("hero");
+const moveLight = e => {
+  const p = e.touches ? e.touches[0] : e, r = hero.getBoundingClientRect();
+  hero.style.setProperty("--x", (p.clientX - r.left) + "px");
+  hero.style.setProperty("--y", (p.clientY - r.top) + "px");
+};
+hero.addEventListener("pointermove", moveLight);
+hero.addEventListener("touchmove", moveLight, { passive: true });
+
+/* Carga inicial: una sola secuencia de entrada */
+addEventListener("load", () => setTimeout(() => {
+  $("loader").classList.add("done"); document.body.classList.add("ready");
+}, 700));
+</script>
+</body>
+</html>
